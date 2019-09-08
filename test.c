@@ -41,8 +41,8 @@ void test(){
 	char* d="ibrahim";
 	char* e="zaaaaraaaaa";
 	
-	void *res;
-	void *res2;
+	void *res = NULL;
+	void *res2 = NULL;
 	Vector *v = vectorCreate(2);
 	printf("\nvector after pushing new elements \n\t");
 
@@ -57,12 +57,12 @@ void test(){
 	vectorPrint(v,print_str);
 	
 
-	vectorRemove(v,3,&res);  
+	vectorRemove(v,5,&res);  
 	printf(" result after removing : %s\n ",*(char**)res);
 	printf("vector after removing element 3\n\t");
 	vectorPrint(v,print_str);
 
-	vectorGetElement(v, 3, &res2); 
+	vectorGetElement(v, 5, &res2); 
 	if(res2)
 		printf(" result of gett  : %s\n ",*(char**)res2);
 	else
