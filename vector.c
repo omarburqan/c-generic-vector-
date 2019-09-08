@@ -4,21 +4,29 @@ struct Vector {
     void** items;
     size_t capacity;
     size_t total; /* number of items */
-    /*size_t data_size;*/
+
 };
 
-Vector* vectorCreate(size_t size){ /* check the malloc if null pointer */
+Vector* vectorCreate(size_t size){ 
     Vector *v = malloc(sizeof(Vector));
+    if(!v)
+    	return NULL;
     v->capacity = size;
     v->total = 0;
     v->items = malloc(sizeof(void*) * v->capacity);
+   	if (!v->items)
+   		return NULL;
     return v;
 }
 
 ErrorCode vectorDestroy(Vector **vector){
-	if (!vector){
+	if ( !vector ) /*  if vector is null do nothing just return */
 		return E_NULL_PTR;
-	}
+	if ( !(*vector)->items ){ /* vector->items is null as you have to free the vector and return */ 
+		free(*vector);
+		return E_NULL_PTR;	
+	}					
+	/* else free everything :P */
 	free((*vector)->items);
 	free(*vector);
 	return E_OK;
@@ -27,7 +35,6 @@ ErrorCode vectorPush(Vector *vector, void *value){
 	if (!vector){
 		return E_NULL_PTR;
 	}
-	/* validate overflow. IF full re-allocate */
 	if (vector->capacity == vector->total){ /* when realloc() fails in allocating memory, original pointer is lost */
 		void *res = realloc(vector->items,sizeof(void*) * vector->capacity * 2);
     	if (res) {
@@ -47,6 +54,12 @@ ErrorCode vectorInsert(Vector *vector, void* value, size_t index){
 	if (!vector){
 		return E_NULL_PTR;
 	}
+	if( vector->total+1 == index ){
+		return vectorPush(vector,value);
+	}
+	if ( index > (vector->total) || index == 0){
+		return E_BAD_INDEX;
+	}
 	/* validate overflow. IF full re-allocate */
 	if (vector->capacity == vector->total){ /* when realloc() fails in allocating memory, original pointer is lost */
 		void *res = realloc(vector->items,sizeof(void*) * vector->capacity * 2);
@@ -60,7 +73,7 @@ ErrorCode vectorInsert(Vector *vector, void* value, size_t index){
     } 
 	/* Shifting */
 	vector->total++;
-	for (i = vector->total-1; i > index; i--){
+	for (i = vector->total-1; i >= index; i--){
 		vector->items[i] = vector->items[i-1];
 	}
     vector->items[index-1] = value;
@@ -74,7 +87,7 @@ ErrorCode vectorPop(Vector *vector, void **res){
 
 ErrorCode vectorRemove(Vector *vector, size_t index, void **res){
 	size_t i ;
-	if ( index > vector->total ){
+	if ( index > (vector->total) || index == 0){
 		return E_BAD_INDEX;
 	}
 	if (!vector){
@@ -85,14 +98,14 @@ ErrorCode vectorRemove(Vector *vector, size_t index, void **res){
     for (i = index-1; i <= vector->total -2 ; i++){
   			vector->items[i] = vector->items[i+1];
 	}
-	/*printf("element Removed at 3 is %p \n",res);*/
+
 	vector->total--;
 	return E_OK;
 }
 
 
 ErrorCode vectorGetElement(const Vector *vector, size_t index, void **res){
-	if ( index > vector->total){
+	if ( index > (vector->total) || index == 0){
 		return E_BAD_INDEX;
 	}
 	if (!vector){
@@ -102,7 +115,7 @@ ErrorCode vectorGetElement(const Vector *vector, size_t index, void **res){
 	return E_OK;
 }
 ErrorCode vectorSetElement(Vector *vector, size_t index, void* value){
-	if ( index > vector->total ){
+	if ( index > (vector->total) || index == 0){
 		return E_BAD_INDEX;
 	}
 	if (!vector){
@@ -145,7 +158,7 @@ void vectorPrint(Vector *vector,PrintFunc pf){
 }
 
 size_t vectorForEach(Vector *vector,actionFunc aF){
-		size_t i,target=0 ;
+	size_t i,target=0 ;
 	if(vector){
 
 		for (i=0 ; i < vector->total; i++) {

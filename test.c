@@ -57,7 +57,7 @@ void test(){
 	vectorPrint(v,print_str);
 	
 
-	vectorRemove(v,5,&res);  
+	vectorRemove(v,3,&res);  
 	printf(" result after removing : %s\n ",*(char**)res);
 	printf("vector after removing element 3\n\t");
 	vectorPrint(v,print_str);
@@ -74,6 +74,7 @@ void test(){
 
 	printf("count of value in vector is :\n\t");
 	printf("%lu \n", vectorCount(v,&b,cmp_str));
+
 	printf("calling vectorForEach when action is changing vector values :\n\t");
 	vectorForEach(v,action_str); /* edit vector values for example */
 	vectorForEach(v,action_str2); /* printing vector values */
